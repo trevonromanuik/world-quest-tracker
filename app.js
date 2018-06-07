@@ -28,6 +28,8 @@ let quest_ids = [];
 
 app.get('/scheduled', (req, res) => {
 
+    log(`scheduled task`);
+
     async.waterfall([
         (cb) => {
 
@@ -54,11 +56,17 @@ app.get('/scheduled', (req, res) => {
                 const new_quest_ids = _.keys(new_quests);
                 const added_quest_ids = _.difference(new_quest_ids, quest_ids);
 
+                if(added_quest_ids.length) {
+                    log(`Added Quests: ${added_quest_ids.join(', ')}`);
+                }
+
                 quests = new_quests;
                 quest_ids = new_quest_ids;
 
                 const alert_quest_ids = _.intersection(added_quest_ids, tracked_quest_ids);
                 if(!alert_quest_ids.length) return cb();
+
+                log(`Alerting Quests: ${alert_quest_ids.join(', ')}`);
 
                 const subject = `WQ Alert: ${_.chain(alert_quest_ids).map((id) => {
                     return `${tracked_quests[id]}`;
@@ -80,7 +88,7 @@ app.get('/scheduled', (req, res) => {
     ], (err) => {
         if (err) {
             sendEmail('WQ Tracker Error', JSON.stringify(err));
-            console.error(err);
+            log(`ERROR: ${JSON.stringify(err)}`);
         }
     });
 
@@ -89,7 +97,7 @@ app.get('/scheduled', (req, res) => {
 });
 
 app.listen(3000, () => {
-    console.log('app listening on port 3000');
+    log('app listening on port 3000');
 });
 
 function sendEmail(subject, message, done) {
@@ -101,4 +109,8 @@ function sendEmail(subject, message, done) {
     }, function (err) {
         done && done(err);
     });
+}
+
+function log(message) {
+    console.log(`${(new Date()).toISOString()} - ${message}`);
 }
