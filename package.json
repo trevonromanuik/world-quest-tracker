@@ -1,0 +1,28 @@
+{
+  "name": "world-quest-tracker",
+  "version": "1.0.1",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "async": "2.6.1",
+    "dirty-json": "0.6.0",
+    "express": "4.16.3",
+    "lodash": "4.17.10",
+    "node-ses": "2.1.0",
+    "request": "2.87.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trevonromanuik/world-quest-tracker.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/trevonromanuik/world-quest-tracker/issues"
+  },
+  "homepage": "https://github.com/trevonromanuik/world-quest-tracker#readme"
+}
