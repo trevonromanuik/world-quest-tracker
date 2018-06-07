@@ -26,7 +26,7 @@ const tracked_quest_ids = _.keys(tracked_quests);
 let quests = {};
 let quest_ids = [];
 
-app.get('/scheduled', (req, res) => {
+app.post('/scheduled', (req, res) => {
 
     log(`scheduled task`);
 
