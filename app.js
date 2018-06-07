@@ -60,11 +60,15 @@ app.get('/scheduled', (req, res) => {
                 const alert_quest_ids = _.intersection(added_quest_ids, tracked_quest_ids);
                 if(!alert_quest_ids.length) return cb();
 
+                const subject = `WQ Alert: ${_.chain(alert_quest_ids).map((id) => {
+                    return `${tracked_quests[id]}`;
+                }).join(', ').value()}`;
+
                 const message = _.chain(alert_quest_ids).map((id) => {
                     return `${tracked_quests[id]}: ${new Date(quests[id].ending)}`;
                 }).join('\n').value();
 
-                sendEmail('WQ Alert', message, (err) => {
+                sendEmail(subject, message, (err) => {
                     cb(err);
                 });
 

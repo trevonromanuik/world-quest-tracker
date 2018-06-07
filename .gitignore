@@ -1,6 +1,7 @@
 keys.js
 app.zip
 .idea/
+.DS_Store
 
 # Logs
 logs
