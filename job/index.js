@@ -70,7 +70,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
     return quest_instance.quest._id;
   });
 
-  app.get('/scheduled', (req, res) => {
+  app.post('/scheduled', (req, res) => {
 
     log(`scheduled task`, LOG_LEVELS.INFO);
 

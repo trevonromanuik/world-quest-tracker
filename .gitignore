@@ -1,6 +1,7 @@
 keys.js
 db/prisma.yml
 db/generated/
+dist/
 
 *.zip
 .idea/
