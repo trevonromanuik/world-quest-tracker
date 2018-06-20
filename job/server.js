@@ -44,7 +44,7 @@ const prisma = new Prisma({
   typeDefs: 'db/generated/prisma.graphql',
   endpoint: keys.prisma.url,
   secret: keys.prisma.secret,
-  debug: true
+  debug: false
 });
 
 const quest_fields = '{ _id name lastSeen type factions { _id } zones { _id } }';
