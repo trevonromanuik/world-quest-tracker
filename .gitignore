@@ -1,4 +1,7 @@
 keys.js
+db/prisma.yml
+db/generated/
+
 *.zip
 .idea/
 .DS_Store

@@ -1,0 +1,40 @@
+type User {
+    id: ID! @unique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    name: String!
+    email: String! @unique
+    password: String!
+}
+
+type Quest {
+    _id: Int! @unique
+    name: String!
+    lastSeen: DateTime!
+    type: Int!
+    factions: [Faction!]!
+    zones: [Zone!]!
+}
+
+type QuestInstance {
+    quest: Quest!
+    ending: DateTime!
+    rewards: [Item!]!
+}
+
+type Faction {
+    _id: Int! @unique
+    name: String!
+}
+
+type Item {
+    _id: Int! @unique
+    name: String!
+    quality: Int!
+    icon: String!
+}
+
+type Zone {
+    _id: Int! @unique
+    name: String!
+}
