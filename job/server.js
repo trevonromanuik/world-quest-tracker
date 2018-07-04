@@ -217,6 +217,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
                   }
 
                   // else create a new QuestInstance
+                  log(`Creating QuestInstance: ${quest._id} - ${quest.name}: ${formatDate(item.ending)}`, LOG_LEVELS.DEBUG);
                   quest_instances[quest._id] = await prisma.mutation.createQuestInstance({
                     data: {
                       quest: { connect: { _id: quest._id } },
@@ -264,12 +265,16 @@ const quest_instance_fields = '{ ending quest { _id } }';
 
                 } catch (e) {
                   handleError(e);
-                  cb();
                 }
+
+                cb();
 
               })();
 
             }, () => {
+
+              // if (!new_quest_instance_ids.length) return cb();
+              log(`New QuestInstances: ${new_quest_instance_ids.join(', ')}`, LOG_LEVELS.INFO);
 
               const alert_quest_ids = _.intersection(new_quest_instance_ids, tracked_quest_ids);
               if (!alert_quest_ids.length) return cb();
@@ -298,14 +303,11 @@ const quest_instance_fields = '{ ending quest { _id } }';
 
       }
     ], (err) => {
-      if (err) {
-        handleError(err);
-      }
+      if (err) handleError(err);
+      log(`completed scheduled task`, LOG_LEVELS.INFO);
     });
 
     res.sendStatus(200);
-
-    log(`completed scheduled task`, LOG_LEVELS.INFO);
 
   });
 
@@ -317,13 +319,13 @@ const quest_instance_fields = '{ ending quest { _id } }';
   function formatDate(date) {
 
     date = new Date(date);
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset() + TIMEZONE_OFFSET);
+    date.setUTCMinutes(date.getUTCMinutes() - TIMEZONE_OFFSET);
 
-    let month = date.getMonth();
-    let day = date.getDate();
-    let year = date.getFullYear();
-    let hour = date.getHours();
-    let minute = date.getMinutes();
+    let month = date.getUTCMonth();
+    let day = date.getUTCDate();
+    let year = date.getUTCFullYear();
+    let hour = date.getUTCHours();
+    let minute = date.getUTCMinutes();
 
     if (minute < 10) minute = `0${minute}`;
 
