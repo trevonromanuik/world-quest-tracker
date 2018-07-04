@@ -1,0 +1,11 @@
+# import Faction from './faction.graphql'
+# import Zone from './zone.graphql'
+
+type Quest {
+    _id: Int! @unique
+    name: String!
+    lastSeen: DateTime!
+    type: Int!
+    factions: [Faction!]!
+    zones: [Zone!]!
+}

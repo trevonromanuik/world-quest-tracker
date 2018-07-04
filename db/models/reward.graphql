@@ -1,0 +1,6 @@
+# import Item from './item.graphql'
+
+type Reward {
+    item: Item!
+    quantity: Int!
+}

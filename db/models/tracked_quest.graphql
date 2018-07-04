@@ -1,0 +1,9 @@
+# import Quest from './quest.graphql'
+# import User from './user.graphql'
+
+type TrackedQuest {
+    quest: Quest!
+    user: User!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+}

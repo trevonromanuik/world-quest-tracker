@@ -33,13 +33,6 @@ const client = ses.createClient({
 const express = require('express');
 const app = express();
 
-const tracked_quest_ids = [
-  41896,//: 'Operation Murloc Freedom',
-  42023,//: 'Black Rook Rumble',
-  42025,//: 'Bareback Brawl',
-  41013//: 'Darkbrul Arena'
-];
-
 const prisma = new Prisma({
   typeDefs: 'db/generated/prisma.graphql',
   endpoint: keys.prisma.url,
@@ -222,7 +215,15 @@ const quest_instance_fields = '{ ending quest { _id } }';
                     data: {
                       quest: { connect: { _id: quest._id } },
                       ending: new Date(item.ending),
-                      rewards: []
+                      rewards: {
+                        create: _.chain(item.rewards && item.rewards.items).map((reward) => {
+                          if (!items[reward.id]) {
+                            handleError(`Could not find Item with id: ${reward.id}`);
+                            return null;
+                          }
+                          return { item: { connect: { _id: reward.id } }, quantity: reward.qty };
+                        }).compact().value()
+                      }
                     }
                   }, quest_instance_fields);
 
@@ -273,25 +274,44 @@ const quest_instance_fields = '{ ending quest { _id } }';
 
             }, () => {
 
-              // if (!new_quest_instance_ids.length) return cb();
+              if (!new_quest_instance_ids.length) return cb();
               log(`New QuestInstances: ${new_quest_instance_ids.join(', ')}`, LOG_LEVELS.INFO);
 
-              const alert_quest_ids = _.intersection(new_quest_instance_ids, tracked_quest_ids);
-              if (!alert_quest_ids.length) return cb();
+              (async () => {
 
-              log(`Alerting Quests: ${alert_quest_ids.join(', ')}`, LOG_LEVELS.INFO);
+                let tracked_quests = await prisma.query.trackedQuests({
+                  where: { quest: { _id_in: new_quest_instance_ids } }
+                }, `{ user { id email } quest { _id } }`);
 
-              const subject = `WQ Alert: ${_.chain(alert_quest_ids).map((id) => {
-                return `${quests[id].name}`;
-              }).join(', ').value()}`;
+                if (!tracked_quests.length) return cb();
 
-              const message = _.chain(alert_quest_ids).map((id) => {
-                return `${quests[id].name}: ${formatDate(quest_instances[id].ending)}`;
-              }).join('\n').value();
+                let user_groups = _.groupBy(tracked_quests, tracked_quest => tracked_quest.user.id);
+                async.eachLimit(_.keys(user_groups), 5, (user_id, cb) => {
 
-              sendEmail(subject, message, (err) => {
-                cb(err);
-              });
+                  let tracked_quests = user_groups[user_id];
+                  let user = tracked_quests[0].user;
+                  let alert_quest_ids = _.map(user_groups[user_id], tracked_quest => tracked_quest.quest._id);
+
+                  log(`Alerting ${user.id} of Quests: ${alert_quest_ids.join(', ')}`, LOG_LEVELS.INFO);
+
+                  const subject = `WQ Alert: ${_.chain(alert_quest_ids).map((id) => {
+                    return `${quests[id].name}`;
+                  }).join(', ').value()}`;
+
+                  const message = _.chain(alert_quest_ids).map((id) => {
+                    return `${quests[id].name}: ${formatDate(quest_instances[id].ending)}`;
+                  }).join('\n').value();
+
+                  sendEmail(user.email, subject, message, (err) => {
+                    if(err) handleError(err);
+                    cb();
+                  });
+
+                }, () => {
+                  cb();
+                });
+
+              })();
 
             });
 
@@ -342,9 +362,9 @@ const quest_instance_fields = '{ ending quest { _id } }';
     log(`${JSON.stringify(err)}`, LOG_LEVELS.ERROR);
   }
 
-  function sendEmail(subject, message, done) {
+  function sendEmail(email, subject, message, done) {
     client.sendEmail({
-      to: keys.email,
+      to: email,
       from: `WQ Tracker<${keys.email}>`,
       subject: subject,
       message: message

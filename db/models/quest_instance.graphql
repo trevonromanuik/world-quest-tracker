@@ -1,0 +1,8 @@
+# import Quest from './quest.graphql'
+# import Reward from './reward.graphql'
+
+type QuestInstance {
+    quest: Quest!
+    ending: DateTime!
+    rewards: [Reward!]!
+}

@@ -1,0 +1,4 @@
+type Zone {
+    _id: Int! @unique
+    name: String!
+}

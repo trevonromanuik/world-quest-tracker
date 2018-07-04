@@ -1,0 +1,6 @@
+type Item {
+    _id: Int! @unique
+    name: String!
+    quality: Int!
+    icon: String!
+}
