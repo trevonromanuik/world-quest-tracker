@@ -6,6 +6,7 @@ type Quest {
     name: String!
     lastSeen: DateTime!
     type: Int!
+    side: Int!
     factions: [Faction!]!
     zones: [Zone!]!
 }

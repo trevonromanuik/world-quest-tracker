@@ -63,7 +63,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
     return quest_instance.quest._id;
   });
 
-  app.post('/scheduled', (req, res) => {
+  app.post('/', (req, res) => {
 
     log(`scheduled task`, LOG_LEVELS.INFO);
 
@@ -79,7 +79,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
       (cb) => {
 
         // fetch the page from wowhead
-        request('http://www.wowhead.com/world-quests/na', (err, response, body) => {
+        request('https://www.wowhead.com/world-quests/na', (err, response, body) => {
           if (err) return cb(err);
           if (response.statusCode !== 200) return cb(`Received invalid status code: ${response.statusCode}`);
           cb(null, body);
@@ -91,7 +91,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
         (async () => {
 
           let start = 0;
-          let zone_phrase = '<a href="http://www.wowhead.com/zone=';
+          let zone_phrase = '<a href="https://www.wowhead.com/zone=';
           while ((start = body.indexOf(zone_phrase, start)) > -1) {
 
             start += zone_phrase.length;
@@ -158,6 +158,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
                     name: data.name_enus,
                     lastSeen: new Date(0),
                     type: -1,
+                    side: data._side,
                     factions: [],
                     zones: []
                   }
@@ -180,7 +181,7 @@ const quest_instance_fields = '{ ending quest { _id } }';
           }
 
           // parse out the WQ data
-          const phrase = 'var lvWorldQuests = new Listview(';
+          const phrase = 'new Listview(';
           start = body.indexOf(phrase) + phrase.length;
           if (start < phrase.length) return cb(`Could not find phrase in body: ${body}`);
           let end = body.indexOf(');', start);
